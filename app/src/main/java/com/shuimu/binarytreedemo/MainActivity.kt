@@ -2,6 +2,7 @@ package com.shuimu.binarytreedemo
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.shuimu.binarytreedemo.binary.AviTree
 import com.shuimu.binarytreedemo.binary.BinaryNode
 import com.shuimu.binarytreedemo.binary.BinarySortTree
 import com.shuimu.binarytreedemo.binary.BinaryTree
@@ -23,6 +24,15 @@ fun main() {
         )}"
     )
     testSort001()
+    testAviTree()
+}
+
+fun testAviTree(){
+    val aviTree:AviTree<Int> = AviTree()
+    aviTree.inser(20)
+    aviTree.inser(22)
+    aviTree.inser(23)
+    aviTree.inser(18)
 }
 
 fun testSort001(){

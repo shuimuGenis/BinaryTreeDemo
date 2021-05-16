@@ -7,9 +7,9 @@ package com.shuimu.binarytreedemo.binary
  */
 class AviNode<T>(
     var data: T,
-    var left: BinaryNode<T>? = null,
-    var right: BinaryNode<T>? = null,
-    var height: Int
+    var left: AviNode<T>? = null,
+    var right: AviNode<T>? = null,
+    var height: Int = 0
 ) {
     override fun equals(other: Any?): Boolean {
         return other is AviNode<*> && data == other.data
