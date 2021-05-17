@@ -15,7 +15,7 @@ class MainActivity : AppCompatActivity() {
 }
 
 fun main() {
-    testTree01()
+   /* testTree01()
 
     println(
         "20在数组中的索引：${search(
@@ -23,7 +23,7 @@ fun main() {
             40
         )}"
     )
-    testSort001()
+    testSort001()*/
     testAviTree()
 }
 
@@ -33,6 +33,9 @@ fun testAviTree(){
     aviTree.inser(22)
     aviTree.inser(23)
     aviTree.inser(18)
+    aviTree.inser(19)
+    aviTree.inser(16)
+    aviTree.preOrder()
 }
 
 fun testSort001(){

@@ -127,7 +127,24 @@ class AviTree<T : Comparable<T>> {
                 }
                 //平衡因子>1 代表最小不平衡子树
                 if (balanceRia > 1) {
+                    /*
+                    * 在上一轮循环结束后,数据已经被存放好了,这时当我们发现平衡因子>1时，那么就要知道数据是插入在“最小不平衡子树的左边还是右边”，
+                    * 确定了是在“最小不平衡子树的左边或右边之后”就要判断数据是插入在“最小不平衡子树的左节点的左边还是右边”或
+                    * “最小不平衡子树的右节点的左边还是右边”。
+                    * */
+                    //当前这个最小不平衡子树同时存在左右节点时
+                    if (rightIsNotEmpty && leftIsNotEmpty) {
+                        if (data.compareTo(tempNode.data) == 1) {
+                            //说明是放在"最小不平衡子树"的右边
+                            leftIsNotEmpty = false
+                        } else {
+                            //说明是放在"最小不平衡子树"的左边
+                            rightIsNotEmpty = false
+                        }
+                    }
+
                     if (rightIsNotEmpty) {
+                        //进入这个判断说明：节点是放在“最小不平衡子树”的右边时
                         if (data.compareTo(tempNode.right!!.data) == 1) {
                             //条件满足，表示数据比最小不平衡子树的右孩子节点大，数据被插入在"最小不平衡子树的右孩子的右子树上"
                             //根据公式：插入的元素在最小不平衡子树的右孩子的右子树上时，只需要对最小不平衡子树进行一次左旋即可恢复平衡。
@@ -136,15 +153,16 @@ class AviTree<T : Comparable<T>> {
                         } else {
                             //说明数据比最小不平衡子树的右孩子节点小，数据被插入在"最小不平衡子树的右孩子的左子树上"
                             //根据公式：插入的元素在最小不平衡子树的右孩子的左子树上时，需要先对"最小不平衡子树的右孩子"进行右旋,然后对"最小不平衡子树"进行一次左旋即可恢复平衡。
-                            println("对最小不平衡子树的右孩子右旋，然后对最小不平衡子树进行左旋")
+                            println("对最小不平衡子树的右孩子右旋${tempNode.right!!.data}，然后对最小不平衡子树${tempNode.data}进行左旋")
                             rightRotate(tempNode.right!!)
                             leftRotate(tempNode)
                         }
-                    } else {
+                    } else if (leftIsNotEmpty) {
+                        //进入这个判断说明：节点是放在“最小不平衡子树”的左边
                         if (data.compareTo(tempNode.left!!.data) == 1) {
                             //条件满足，说明“数据所代表的节点”比"最小不平衡子树的左节点大",“数据所代表的节点”被插入在"最小不平衡子树的左节点的右子树上"。
                             //根据公式：插入的元素在最小不平衡子树的左孩子的右子树上时，需要先对“最小不平衡子树的左孩子”进行左旋，然后对“最小不平衡子树”进行右旋。
-                            println("对最小不平衡子树的左孩子左旋，然后对最小不平衡子树进行右旋")
+                            println("对最小不平衡子树的左孩子左旋${tempNode.left!!.data}，然后对最小不平衡子树${tempNode.data}进行右旋")
                             leftRotate(tempNode.left!!)
                             rightRotate(tempNode)
                         } else {
@@ -193,6 +211,12 @@ class AviTree<T : Comparable<T>> {
             node.data = oldNode.data
             node.right = oldNode.right
             /*
+          * 这里为什么要进行限制呢?
+          * 避免根节点出现高度为0。这种情况发生在“左右旋”和“右左旋”时，原因是“左右旋”和“右左旋”第一步是对
+          * “最小不平衡子树的孩子节点进行旋转”所造成的。
+          * */
+            node.height = if (oldNode.height == 0) 1 else oldNode.height
+            /*
             * 根据左旋规则：最后根节点作为右节点的左节点存在。
             * 因此把新根节点newNode挂在右节点node的左节点下即可
             * */
@@ -208,6 +232,8 @@ class AviTree<T : Comparable<T>> {
             //这里还有一个小问题就是，为什么根节点是少了两层子节点，
             // 其实是这样理解的：根节点下沉到与其右节点同一层高度时算一层，然后下沉到与其右节点的子节点的高度时又算一层，因此是下沉了两层
             newNode.height -= 2
+            //同样的这里也限制，避免高度出现负数
+            if (newNode.height < 0) newNode.height = 0
         }
     }
 
@@ -242,6 +268,12 @@ class AviTree<T : Comparable<T>> {
             node.data = oldNode.data
             node.left = oldNode.left
             /*
+           * 这里为什么要进行限制呢?
+           * 避免根节点出现高度为0。这种情况发生在“左右旋”和“右左旋”时，原因是“左右旋”和“右左旋”第一步是对
+           * “最小不平衡子树的孩子节点进行旋转”所造成的。
+           * */
+            node.height = if (oldNode.height == 0) 1 else oldNode.height
+            /*
              * 最后根据右旋规则：根节点作为左节点的右节点存在。
              * 因此把新根节点newNode挂在左节点node的右节点下即可
              * */
@@ -249,6 +281,29 @@ class AviTree<T : Comparable<T>> {
             //右旋操作完成之后，就要重新设置节点的高度。
             //只有根节点的左节点少了2层子节点而已，其他节点的高度不变。
             newNode.height -= 2
+            //同样的这里也限制，避免高度出现负数
+            if (newNode.height < 0) newNode.height = 0
         }
+    }
+
+    fun preOrder() {
+        if (root == null) {
+            return
+        }
+        val cache: Stack<AviNode<T>> = Stack()
+        var tempNode: AviNode<T>? = root
+        println("avi树的前序遍历开始：")
+        while (tempNode != null) {
+            println(tempNode.data)
+            if (tempNode.right != null) {
+                cache.push(tempNode.right)
+            }
+            tempNode = if (tempNode.left != null) {
+                tempNode.left
+            } else if (cache.size > 0) {
+                cache.pop()
+            } else null
+        }
+        println("avi树的前序遍历结束")
     }
 }
